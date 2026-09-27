@@ -2,10 +2,12 @@ import {
   Alert,
   FlatList,
   Image,
+  Platform,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -16,13 +18,6 @@ import { useState, useEffect } from "react";
 import { ItemStorage, itemsStorage } from "@/storage/itemsStorage";
 
 const FILTER_STATUS: FilterStatus[] = [FilterStatus.PENDING, FilterStatus.DONE];
-
-const ITEMS = [
-  { id: "1", status: FilterStatus.DONE, description: "Coca" },
-  { id: "2", status: FilterStatus.PENDING, description: "Café" },
-  { id: "3", status: FilterStatus.DONE, description: "feijão" },
-  { id: "4", status: FilterStatus.PENDING, description: "Arroz" },
-];
 
 export function Home() {
   const [filter, setFilter] = useState(FilterStatus.PENDING);
@@ -40,12 +35,17 @@ export function Home() {
       status: FilterStatus.PENDING,
     };
 
-    await itemsStorage.add(newItem);
-    await itemsByStatus();
+    try {
+      await itemsStorage.add(newItem);
+      await itemsByStatus();
 
-    Alert.alert("Adicionado", `Adicionado ${description}`);
-    setDescription("");
-    setFilter(FilterStatus.PENDING);
+      Alert.alert("Adicionado", `Adicionado ${description}`);
+      setDescription("");
+      setFilter(FilterStatus.PENDING);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro", "Não foi possível adicionar o item.");
+    }
   }
 
   async function handleRemove(id: string) {
@@ -54,7 +54,7 @@ export function Home() {
       await itemsByStatus();
     } catch (error) {
       console.log(error);
-      Alert.alert("Remover", "Não foi possível remover o itenm.");
+      Alert.alert("Remover", "Não foi possível remover o item.");
     }
   }
 
@@ -69,6 +69,13 @@ export function Home() {
   }
 
   function handleClear() {
+    if (Platform.OS === "web") {
+      if (window.confirm("Tem certeza que deseja limpar a lista?")) {
+        onClear();
+      }
+      return;
+    }
+
     Alert.alert("Limpar", "Tem certeza que deseja limpar a lista?", [
       {
         text: "Não",
@@ -94,7 +101,7 @@ export function Home() {
   async function handleToggleItemStatus(id: string) {
     try {
       await itemsStorage.toggleStatus(id);
-      await itemsByStatus()
+      await itemsByStatus();
     } catch (error) {
       console.log(error);
       Alert.alert("Erro", "Não foi possível atualizar o status.");
@@ -106,7 +113,7 @@ export function Home() {
   }, [filter]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Image style={styles.logo} source={require("@/assets/logo.png")} />
 
       <View style={styles.form}>
@@ -124,11 +131,16 @@ export function Home() {
             <Filter
               key={status}
               status={status}
-              isActive={status == filter}
+              isActive={status === filter}
               onPress={() => setFilter(status)}
             />
           ))}
-          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+          <TouchableOpacity
+            style={styles.clearButton}
+            onPress={handleClear}
+            hitSlop={10}
+            accessibilityRole="button"
+          >
             <Text style={styles.clearText}>Limpar</Text>
           </TouchableOpacity>
         </View>
@@ -151,6 +163,6 @@ export function Home() {
           )}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,11 +1,12 @@
 import { StyleSheet } from "react-native";
+import { colors } from "@/theme/colors";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        backgroundColor: "#d0d2d8",
-        paddingTop: 62
+        backgroundColor: colors.background,
+        paddingTop: 16
     },
     logo: {
         height: 34,
@@ -20,7 +21,7 @@ export const styles = StyleSheet.create({
     content: {
         flex: 1,
         width: "100%",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: colors.white,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         paddingTop: 32,
@@ -32,7 +33,7 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 12,
         borderBottomWidth: 1,
-        borderBottomColor: "#E4E6EC",
+        borderBottomColor: colors.gray200,
         paddingBottom: 12
     },
     clearButton: {
@@ -40,13 +41,13 @@ export const styles = StyleSheet.create({
     },
     clearText: {
         fontSize: 12,
-        color: "#828282",
+        color: colors.gray400,
         fontWeight: 600
     },
     separator: {
         width: "100%",
         height: 1,
-        backgroundColor: "#EEF0F5",
+        backgroundColor: colors.gray100,
         marginVertical: 16,
     },
     listContent: {
@@ -55,7 +56,7 @@ export const styles = StyleSheet.create({
     },
     empty: {
         fontSize: 14,
-        color: "#808080",
+        color: colors.gray500,
         textAlign: "center"
     }
 })
